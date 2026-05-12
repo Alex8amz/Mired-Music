@@ -1,0 +1,17 @@
+{
+  "name": "wired-music",
+  "version": "1.0.0",
+  "description": "Wired Music Player",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "howler": "^2.2.4",
+    "music-metadata": "^10.0.0"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0"
+  }
+}

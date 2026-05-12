@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wired Music</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div id="logo">
+        <span class="logo-name">Wired Music</span>
+        <span class="logo-tag">PLAYER</span>
+      </div>
+      <nav>
+        <span class="nav-label">Biblioteca</span>
+        <a class="nav-item active" data-view="songs">
+          <i>♪</i> Canciones
+        </a>
+        <a class="nav-item" data-view="favorites">
+          <i>♡</i> Favoritas
+        </a>
+        <a class="nav-item" data-view="albums">
+          <i>◉</i> Álbumes
+        </a>
+        <a class="nav-item" data-view="artists">
+          <i>◎</i> Artistas
+        </a>
+        <span class="nav-label">Herramientas</span>
+        <a class="nav-item" data-view="stats">
+          <i>▦</i> Estadísticas
+        </a>
+        <a class="nav-item" data-view="equalizer">
+          <i>≋</i> Ecualizador
+        </a>
+        <a class="nav-item" data-view="settings">
+          <i>⚙</i> Configuración
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main id="main">
+      <div id="toolbar">
+        <span id="toolbar-title">Todas las canciones</span>
+        <div id="toolbar-actions">
+          <button id="btn-search" title="Buscar">⌕</button>
+          <button id="btn-add-files" title="Agregar archivos">+</button>
+          <button id="btn-add-folder" title="Agregar carpeta">▤</button>
+        </div>
+      </div>
+      <div id="track-header">
+        <span class="col-num">#</span>
+        <span class="col-info">título</span>
+        <span class="col-fmt">fmt</span>
+        <span class="col-dur">dur.</span>
+      </div>
+      <div id="tracklist">
+        <div id="empty-state">
+          <p>No hay canciones todavía</p>
+          <p class="empty-sub">Usa los botones de arriba para agregar archivos o una carpeta</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Panel derecho -->
+    <aside id="player-panel">
+      <div id="album-art">
+        <div id="art-inner">♪</div>
+      </div>
+      <div id="now-info">
+        <div id="now-title">Sin reproducción</div>
+        <div id="now-artist">—</div>
+        <div id="now-meta">
+          <span id="now-fmt" class="fmt-badge">—</span>
+          <button id="btn-like" title="Me gusta">♡</button>
+        </div>
+      </div>
+      <div id="progress-area">
+        <div id="progress-track">
+          <div id="progress-fill"></div>
+          <div id="progress-thumb"></div>
+        </div>
+        <div id="time-row">
+          <span id="time-current">0:00</span>
+          <span id="time-total">0:00</span>
+        </div>
+      </div>
+      <div id="controls">
+        <button class="ctrl-btn" id="btn-shuffle" title="Aleatorio">⇄</button>
+        <button class="ctrl-btn" id="btn-prev" title="Anterior">⏮</button>
+        <button id="btn-play" title="Reproducir">▶</button>
+        <button class="ctrl-btn" id="btn-next" title="Siguiente">⏭</button>
+        <button class="ctrl-btn" id="btn-repeat" title="Repetir">↺</button>
+      </div>
+      <div id="volume-row">
+        <span>🔈</span>
+        <input type="range" id="volume-slider" min="0" max="100" value="80">
+        <span id="volume-val">80</span>
+      </div>
+      <div id="chips">
+        <div class="chip" id="chip-lyrics" title="Letras sincronizadas">lrc</div>
+        <div class="chip" id="chip-sleep" title="Sleep timer">sleep</div>
+        <div class="chip" id="chip-viz" title="Visualizador">viz</div>
+      </div>
+    </aside>
+
+  </div>
+
+  <script src="js/player.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
