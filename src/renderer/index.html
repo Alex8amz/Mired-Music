@@ -52,12 +52,6 @@
           <button id="btn-add-folder" title="Agregar carpeta">▤</button>
         </div>
       </div>
-      <div id="track-header">
-        <span class="col-num">#</span>
-        <span class="col-info">título</span>
-        <span class="col-fmt">fmt</span>
-        <span class="col-dur">dur.</span>
-      </div>
       <div id="tracklist">
         <div id="empty-state">
           <p>No hay canciones todavía</p>
@@ -66,11 +60,13 @@
       </div>
     </main>
 
-    <!-- Panel derecho -->
-    <aside id="player-panel">
-      <div id="album-art">
-        <div id="art-inner">♪</div>
-      </div>
+<!-- Panel derecho -->
+<aside id="player-panel">
+  <div id="art-wrapper">
+    <div id="album-art">
+      <div id="art-inner">♪</div>
+    </div>
+    <div id="art-overlay">
       <div id="now-info">
         <div id="now-title">Sin reproducción</div>
         <div id="now-artist">—</div>
@@ -79,34 +75,42 @@
           <button id="btn-like" title="Me gusta">♡</button>
         </div>
       </div>
-      <div id="progress-area">
-        <div id="progress-track">
-          <div id="progress-fill"></div>
-          <div id="progress-thumb"></div>
-        </div>
-        <div id="time-row">
-          <span id="time-current">0:00</span>
-          <span id="time-total">0:00</span>
-        </div>
+    </div>
+  </div>
+
+  <div id="player-bottom">
+    <div id="progress-area">
+      <div id="progress-track">
+        <div id="progress-fill"></div>
+        <div id="progress-thumb"></div>
       </div>
-      <div id="controls">
-        <button class="ctrl-btn" id="btn-shuffle" title="Aleatorio">⇄</button>
-        <button class="ctrl-btn" id="btn-prev" title="Anterior">⏮</button>
-        <button id="btn-play" title="Reproducir">▶</button>
-        <button class="ctrl-btn" id="btn-next" title="Siguiente">⏭</button>
-        <button class="ctrl-btn" id="btn-repeat" title="Repetir">↺</button>
+      <div id="time-row">
+        <span id="time-current">0:00</span>
+        <span id="time-total">0:00</span>
       </div>
-      <div id="volume-row">
-        <span>🔈</span>
-        <input type="range" id="volume-slider" min="0" max="100" value="80">
-        <span id="volume-val">80</span>
-      </div>
-      <div id="chips">
-        <div class="chip" id="chip-lyrics" title="Letras sincronizadas">lrc</div>
-        <div class="chip" id="chip-sleep" title="Sleep timer">sleep</div>
-        <div class="chip" id="chip-viz" title="Visualizador">viz</div>
-      </div>
-    </aside>
+    </div>
+
+    <div id="controls">
+      <button class="ctrl-btn" id="btn-shuffle" title="Aleatorio">⇄</button>
+      <button class="ctrl-btn" id="btn-prev" title="Anterior">⏮</button>
+      <button id="btn-play" title="Reproducir">▶</button>
+      <button class="ctrl-btn" id="btn-next" title="Siguiente">⏭</button>
+      <button class="ctrl-btn" id="btn-repeat" title="Repetir">↺</button>
+    </div>
+
+    <div id="volume-row">
+      <span>🔈</span>
+      <input type="range" id="volume-slider" min="0" max="100" value="80">
+      <span id="volume-val">80</span>
+    </div>
+
+    <div id="chips">
+      <div class="chip" id="chip-lyrics" title="Letras sincronizadas">lrc</div>
+      <div class="chip" id="chip-sleep" title="Sleep timer">sleep</div>
+      <div class="chip" id="chip-viz" title="Visualizador">viz</div>
+    </div>
+  </div>
+</aside>
 
   </div>
 

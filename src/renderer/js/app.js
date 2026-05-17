@@ -1,4 +1,3 @@
-// ── Imports ──
 const { ipcRenderer } = require('electron')
 const fs = require('fs')
 const path = require('path')
@@ -14,7 +13,8 @@ const State = {
   repeat: false,
   volume: 0.8,
   sound: null,
-  progressTimer: null
+  progressTimer: null,
+  currentView: 'songs'
 }
 
 // ── Cargar archivos ──
@@ -46,7 +46,7 @@ async function loadFiles(filePaths) {
       console.error('Error:', filePath, err.message)
     }
   }
-  renderTracklist()
+  renderCurrentView()
 }
 
 // ── Reproducir ──
@@ -70,7 +70,7 @@ function playTrack(index) {
       updatePlayButton()
       updateNowPlaying()
       startProgressTimer()
-      renderTracklist()
+      renderCurrentView()
     },
     onend: () => {
       clearInterval(State.progressTimer)
@@ -121,7 +121,47 @@ function startProgressTimer() {
   }, 500)
 }
 
-// ── UI ──
+// ── Color ambiente ──
+function extractColor(coverUrl, callback) {
+  if (!coverUrl) { callback(null); return }
+  const img = new Image()
+  img.onload = () => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 50
+    canvas.height = 50
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, 50, 50)
+    const data = ctx.getImageData(0, 0, 50, 50).data
+    let r = 0, g = 0, b = 0, count = 0
+    for (let i = 0; i < data.length; i += 16) {
+      r += data[i]; g += data[i + 1]; b += data[i + 2]; count++
+    }
+    callback(`${Math.round(r/count)},${Math.round(g/count)},${Math.round(b/count)}`)
+  }
+  img.onerror = () => callback(null)
+  img.src = coverUrl
+}
+
+function applyAmbientColor(rgb) {
+  const panel = document.getElementById('player-panel')
+  let overlay = document.getElementById('ambient-overlay')
+  if (!overlay) {
+    overlay = document.createElement('div')
+    overlay.id = 'ambient-overlay'
+    overlay.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:0;transition:background 2s ease;opacity:0.05;'
+    document.body.appendChild(overlay)
+  }
+  if (!rgb) {
+    panel.style.background = ''
+    overlay.style.background = ''
+    return
+  }
+  panel.style.background = `linear-gradient(180deg, rgba(${rgb},0.18) 0%, #0d0d0d 55%)`
+  panel.style.transition = 'background 1.5s ease'
+  overlay.style.background = `rgb(${rgb})`
+}
+
+// ── UI: Now Playing ──
 function updateNowPlaying() {
   const track = State.tracks[State.currentIndex]
   if (!track) return
@@ -137,10 +177,20 @@ function updateNowPlaying() {
   const likeBtn = document.getElementById('btn-like')
   likeBtn.textContent = track.liked ? '♥' : '♡'
   likeBtn.classList.toggle('liked', track.liked)
+  extractColor(track.cover, applyAmbientColor)
 }
 
 function updatePlayButton() {
   document.getElementById('btn-play').textContent = State.playing ? '⏸' : '▶'
+}
+
+// ── Render vistas ──
+function renderCurrentView() {
+  if (State.currentView === 'favorites') {
+    renderFavorites()
+  } else {
+    renderTracklist()
+  }
 }
 
 function renderTracklist() {
@@ -151,25 +201,47 @@ function renderTracklist() {
   }
   container.innerHTML = ''
   State.tracks.forEach((track, i) => {
-    const div = document.createElement('div')
-    div.className = 'track-item' + (i === State.currentIndex ? ' playing' : '')
-    div.innerHTML = `
-      <div class="track-num">${i + 1}</div>
-      <div class="track-eq" aria-hidden="true">
-        <div class="eq-bar" style="height:40%"></div>
-        <div class="eq-bar" style="height:70%"></div>
-        <div class="eq-bar" style="height:100%"></div>
-        <div class="eq-bar" style="height:55%"></div>
-      </div>
-      <div class="track-info">
-        <div class="track-name">${track.title}</div>
-        <div class="track-artist">${track.artist}</div>
-      </div>
-      <div class="track-fmt">${track.format}</div>
-      <div class="track-dur">${formatTime(track.duration)}</div>`
-    div.addEventListener('click', () => playTrack(i))
-    container.appendChild(div)
+    container.appendChild(buildTrackItem(track, i))
   })
+}
+
+function renderFavorites() {
+  const container = document.getElementById('tracklist')
+  const favs = State.tracks.filter(t => t.liked)
+  if (!favs.length) {
+    container.innerHTML = `<div id="empty-state"><p>No hay favoritas todavía</p><p class="empty-sub">Dale ♥ a una canción para verla aquí</p></div>`
+    return
+  }
+  container.innerHTML = ''
+  favs.forEach(track => {
+    const i = State.tracks.indexOf(track)
+    container.appendChild(buildTrackItem(track, i))
+  })
+}
+
+function buildTrackItem(track, i) {
+  const div = document.createElement('div')
+  div.className = 'track-item' + (i === State.currentIndex ? ' playing' : '')
+  const coverHtml = track.cover ? `<img src="${track.cover}" alt="cover">` : `♪`
+  div.innerHTML = `
+    <div class="track-num">${i + 1}</div>
+    <div class="track-eq" aria-hidden="true">
+      <div class="eq-bar" style="height:40%"></div>
+      <div class="eq-bar" style="height:70%"></div>
+      <div class="eq-bar" style="height:100%"></div>
+      <div class="eq-bar" style="height:55%"></div>
+    </div>
+    <div class="track-cover">${coverHtml}</div>
+    <div class="track-info">
+      <div class="track-name">${track.title}</div>
+      <div class="track-artist">${track.artist}${track.album ? ' — ' + track.album : ''}</div>
+    </div>
+    <div class="track-right">
+      <div class="track-dur">${formatTime(track.duration)}</div>
+      <div class="track-fmt">${track.format}</div>
+    </div>`
+  div.addEventListener('click', () => playTrack(i))
+  return div
 }
 
 function formatTime(secs) {
@@ -177,7 +249,7 @@ function formatTime(secs) {
   return m + ':' + (ss < 10 ? '0' : '') + ss
 }
 
-// ── Eventos UI ──
+// ── Eventos ──
 document.getElementById('btn-add-files').addEventListener('click', async () => {
   const files = await ipcRenderer.invoke('open-files')
   if (files && files.length) await loadFiles(files)
@@ -217,8 +289,10 @@ document.getElementById('btn-like').addEventListener('click', () => {
   if (State.currentIndex < 0) return
   const track = State.tracks[State.currentIndex]
   track.liked = !track.liked
-  document.getElementById('btn-like').textContent = track.liked ? '♥' : '♡'
-  document.getElementById('btn-like').classList.toggle('liked', track.liked)
+  const btn = document.getElementById('btn-like')
+  btn.textContent = track.liked ? '♥' : '♡'
+  btn.classList.toggle('liked', track.liked)
+  if (State.currentView === 'favorites') renderFavorites()
 })
 
 document.getElementById('progress-track').addEventListener('click', (e) => {
@@ -239,6 +313,18 @@ document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
     item.classList.add('active')
+    State.currentView = item.dataset.view
+    const titles = {
+      songs: 'Todas las canciones',
+      favorites: 'Favoritas',
+      albums: 'Álbumes',
+      artists: 'Artistas',
+      stats: 'Estadísticas',
+      equalizer: 'Ecualizador',
+      settings: 'Configuración'
+    }
+    document.getElementById('toolbar-title').textContent = titles[State.currentView] || ''
+    renderCurrentView()
   })
 })
 
